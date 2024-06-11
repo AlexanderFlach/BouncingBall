@@ -95,46 +95,113 @@ class BallAnimationPanel extends JPanel {
                 var ball2 = physicsScene.balls.get(j);
                 handleBallCollision(ball1, ball2, physicsScene.restitution);
             }
-//            handleWallCollision(ball1, physicsScene.worldSize);
+            handleWallCollision(ball1, physicsScene.worldSize);
 
         }
     }
 
     void handleBallCollision(Ball ball1, Ball ball2, double restitution) {
         Vector2D distance = new Vector2D(0.0, 0.0);
-        distance.subtractVectors(ball2.pos, ball1.pos);
+        // middle points of balls
+        Vector2D vec1 = new Vector2D(ball1.radius + ball1.pos.x, ball1.radius + ball1.pos.y);
+        Vector2D vec2 = new Vector2D(ball2.radius + ball2.pos.x, ball2.radius + ball2.pos.y);
+        // vector between middle points of balls
+        distance.subtractVectors(vec2, vec1);
         double d = distance.length();
         // no collision
         if(d == 0.0 || d > ball1.radius + ball2.radius) {
+            System.out.println("no Collision");
             return;
         }
 
+        System.out.println("Collision!!!");
         // collision response
+        // Normale des Stoßes
+        double nx = distance.x / d;
+        double ny = distance.y / d;
+        // Relativgeschwindigkeit
+        double dvx = ball2.vel.x - ball1.vel.x;
+        double dvy = ball2.vel.y - ball1.vel.y;
 
+        // Relativgeschwindigkeit in Richtung der Normalen
+        double vn = dvx * nx + dvy * ny;
+
+        // Keine Kollision, wenn die Scheiben sich voneinander entfernen
+        if (vn > 0) {
+            return;
+        }
+
+        // Impulsänderung
+        double impulse = 2 * vn / (ball1.mass + ball2.mass);
+
+        // Neue Geschwindigkeiten
+        ball1.vel.x += impulse * ball2.mass * nx;
+        ball1.vel.y += impulse * ball2.mass * ny;
+        ball2.vel.x -= impulse * ball1.mass * nx;
+        ball2.vel.y -= impulse * ball1.mass * ny;
+
+        // Zur Vermeidung des Überschneidens, korrigieren wir die Positionen
+        double overlap = 0.5 * (ball1.radius + ball2.radius - d);
+        ball1.pos.x -= overlap * nx;
+        ball1.pos.y -= overlap * ny;
+        ball2.pos.x += overlap * nx;
+        ball2.pos.y += overlap * ny;
     }
 
-//    void handleWallCollision(Ball ball, Vector2D worldSize) {
-//        if (ball.pos.x < ball.radius/2) {
-//            ball.pos.x = ball.radius/2;
-//            ball.vel.x = -ball.vel.x;
-//            System.out.println(ball.pos.x + " Ball pos");
-//            System.out.println(ball.radius + " Ball radius");
+// Stoß mit Energieverlust
+//    void handleBallCollision(Ball ball1, Ball ball2, double restitution) {
+//        Vector2D distance = new Vector2D(0.0, 0.0);
+//        distance.subtractVectors(ball2.pos, ball1.pos);
+//        double d = distance.length();
+//        // no collision
+//        if(d == 0.0 || d > ball1.radius + ball2.radius) {
+//            System.out.println("no Collision");
+//            return;
 //        }
-//        if (ball.pos.x > worldSize.x - ball.radius) {
-//            ball.pos.x = worldSize.x - ball.radius;
-//            ball.vel.x = -ball.vel.x;
-//        }
-//        if (ball.pos.y < ball.radius) {
-//            ball.pos.y = ball.radius;
-//            ball.vel.y = -ball.vel.y;
-//        }
+//        System.out.println("Collision!!!");
+//        // collision response
+//        // Normale des Stoßes
+//        double nx = distance.x / d;
+//        double ny = distance.y / d;
+//        // Geschwindigkeit in Richtung der Normalen projizieren
+//        double v1n = ball1.vel.x * nx + ball1.vel.y * ny;
+//        double v2n = ball2.vel.x * nx + ball2.vel.y * ny;
 //
-//        if (ball.pos.y > worldSize.y - ball.radius) {
-//            ball.pos.y = worldSize.y - ball.radius;
-//            ball.vel.y = -ball.vel.y;
-//        }
+//        // Geschwindigkeit in tangentialer Richtung projizieren (bleibt unverändert)
+//        double v1t = -ball1.vel.x * ny + ball1.vel.y * nx;
+//        double v2t = -ball2.vel.x * ny + ball2.vel.y * nx;
 //
+//        // Neue Geschwindigkeiten in Normalrichtung nach dem Stoß
+//        double v1nNew = (v1n * (ball1.mass - ball2.mass) + 2 * ball2.mass * v2n) / (ball1.mass + ball2.mass);
+//        double v2nNew = (v2n * (ball2.mass - ball1.mass) + 2 * ball1.mass * v1n) / (ball1.mass + ball2.mass);
+//
+//        // Zurückprojektion auf x- und y-Koordinaten
+//        ball1.vel.x = v1nNew * nx - v1t * ny;
+//        ball1.vel.y = v1nNew * ny + v1t * nx;
+//        ball2.vel.x = v2nNew * nx - v2t * ny;
+//        ball2.vel.y = v2nNew * ny + v2t * nx;
 //    }
+
+    void handleWallCollision(Ball ball, Vector2D worldSize) {
+        if (ball.pos.x <= 0) { // left
+            ball.pos.x = 0.0;
+            ball.vel.x = -ball.vel.x;
+        }
+        if (ball.pos.x + ball.radius*2 > worldSize.x) { // right
+            ball.pos.x = worldSize.x - ball.radius*2;
+            ball.vel.x = -ball.vel.x;
+        }
+        if (ball.pos.y <= 0) { // top
+            ball.pos.y = 0.0;
+            ball.vel.y = -ball.vel.y;
+        }
+
+        if (ball.pos.y + ball.radius*2 > worldSize.y) { // bottom
+            ball.pos.y = worldSize.y - ball.radius*2;
+            ball.vel.y = -ball.vel.y;
+        }
+
+    }
 
 }
 

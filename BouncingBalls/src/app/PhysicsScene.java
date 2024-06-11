@@ -1,6 +1,8 @@
 package app;
 
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.Vector;
 
 public class PhysicsScene {
     public Vector2D gravity;
@@ -34,10 +36,10 @@ public class PhysicsScene {
             for (int i = 0; i < this.numBalls; i++) {
                 double radius = minBallSize + Math.random() * ballSizeVariance;
                 double mass = Math.PI * radius * radius;
-//                Vector2D pos = new Vector2D(Math.random() * simWidth, Math.random() * simHeight);
-                Vector2D pos = new Vector2D(0, 0);
-//                Vector2D vel = new Vector2D(initialVelocity * Math.random(), initialVelocity * Math.random());
-                Vector2D vel = new Vector2D(0, 0);
+                Random random = new Random();
+                Vector2D pos = new Vector2D(random.nextInt((int) (simWidth - radius*2)), random.nextInt((int) (simHeight - radius*2)));
+                Vector2D vel = new Vector2D(initialVelocity * Math.random(), initialVelocity * Math.random());
+
                 System.out.println("Ball #" + i + " created at position " + pos.x + "," + pos.y + " with velocity " + vel.x + "," + vel.y);
                 this.balls.add(new Ball(radius, mass, pos, vel, Constants.RESTITUTION));
             }

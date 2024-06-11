@@ -3,7 +3,7 @@ package app;
 public class Constants {
 	// visualization settings
 	public static int WINDOW_WIDTH = 1000;
-	public static int WINDOW_HEIGHT = 800;
+	public static int WINDOW_HEIGHT = 600;
 
 	// animation and simulation settings
 	public static int FPS = 60;
@@ -14,10 +14,10 @@ public class Constants {
 										// if not simulated at render speed
 	public static final double RESTITUTION = 1.0;
 	public static final Vector2D GRAVITY = new Vector2D(0.0, 0.0);
-	public static final int NUM_BALLS = 1;
+	public static final int NUM_BALLS = 3;
 
 	// ball settings
 	public static final double INITIAL_VELOCITY = 200.0;
-	public static final double MIN_BALL_SIZE = 50;
-	public static final double BALL_SIZE_VARIANCE = 100;
+	public static final double MIN_BALL_SIZE = 30;
+	public static final double BALL_SIZE_VARIANCE = 40;
 }
