@@ -5,6 +5,7 @@ import utils.ApplicationTime;
 import javax.swing.*;
 import java.awt.*;
 
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -102,7 +103,7 @@ class BallAnimationPanel extends JPanel {
                 handleBallCollision(ball1, ball2, physicsScene.restitution);
             }
             handleWallCollision(ball1, physicsScene.worldSize);
-
+            handleWallCollision(ball1);
         }
     }
 
@@ -186,6 +187,37 @@ class BallAnimationPanel extends JPanel {
 //        ball2.vel.x = v2nNew * nx - v2t * ny;
 //        ball2.vel.y = v2nNew * ny + v2t * nx;
 //    }
+
+    public boolean collidesWith(Ball ball, Line2D line) {
+        // Kollision des Balls mit der Linie überprüfen
+        return Line2D.ptSegDist(line.getX1(), line.getY1(), line.getX2(), line.getY2(), ball.pos.x + ball.radius, ball.pos.y + ball.radius) <= ball.radius;
+    }
+
+    void handleWallCollision(Ball ball) {
+        Line2D line = new Line2D.Double();
+        // create vector array to store corner points of octagon
+        Point[] octagon = new Point[8];
+        for(int i = 0; i < octagon.length; i++) {
+            octagon[i] = new Point(physicsScene.polygonX[i], physicsScene.polygonY[i]);
+        }
+        // check collision
+        for(int i = 0; i < physicsScene.polygonX.length; i++) {
+            if(i == physicsScene.polygonX.length - 1) {
+                line.setLine(octagon[i], octagon[0]);
+            }
+            else {
+                line.setLine(octagon[i], octagon[i + 1]);
+            }
+            if(collidesWith(ball, line)) {
+                System.out.println("Collision with Wall!");
+                // collision response
+                // create vector of wall segment and its normal vector
+                Vector2D v = new Vector2D(line.getX2() - line.getX1(), line.getY2() - line.getY1());
+                Vector2D nv = v.normalVector();
+                // mirror velocity
+            }
+        }
+    }
 
     void handleWallCollision(Ball ball, Vector2D worldSize) {
         if (ball.pos.x <= 0) { // left

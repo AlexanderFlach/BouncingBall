@@ -38,6 +38,14 @@ public class Vector2D {
         this.y *= s;
     }
 
+    public Vector2D normalVector() {
+        return new Vector2D(this.y, -this.x);
+    }
+
+    public Vector2D oppositeVector(Vector2D v) {
+        return new Vector2D(-v.x, -v.y);
+    }
+
     public double length() {
         return Math.sqrt(this.dot(this));
     }
