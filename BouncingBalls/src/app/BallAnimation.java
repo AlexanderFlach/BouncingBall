@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class BallAnimation extends Animation {
 
@@ -69,6 +70,11 @@ class BallAnimationPanel extends JPanel {
         g.setColor(Color.LIGHT_GRAY);
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
 
+        // draw octagon with corner points
+        g.setColor(Color.BLUE);
+        g.drawPolygon(physicsScene.polygonX, physicsScene.polygonY, 8);
+        g.fillPolygon(physicsScene.polygonX, physicsScene.polygonY, 8);
+
         // iterate through balls
         for (int i = 0; i < physicsScene.balls.size(); i++) {
             Ball ball = physicsScene.balls.get(i);
@@ -110,11 +116,10 @@ class BallAnimationPanel extends JPanel {
         double d = distance.length();
         // no collision
         if(d == 0.0 || d > ball1.radius + ball2.radius) {
-            System.out.println("no Collision");
             return;
         }
 
-        System.out.println("Collision!!!");
+        System.out.println("Ball Collision!");
         // collision response
         // Normale des Stoßes
         double nx = distance.x / d;

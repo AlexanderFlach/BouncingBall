@@ -16,6 +16,9 @@ public class Constants {
 	public static final Vector2D GRAVITY = new Vector2D(0.0, 0.0);
 	public static final int NUM_BALLS = 3;
 
+	// octagon
+	public static final int margin = 30;
+
 	// ball settings
 	public static final double INITIAL_VELOCITY = 200.0;
 	public static final double MIN_BALL_SIZE = 30;
