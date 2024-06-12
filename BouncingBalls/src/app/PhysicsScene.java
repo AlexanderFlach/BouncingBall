@@ -41,7 +41,7 @@ public class PhysicsScene {
                 double radius = minBallSize + Math.random() * ballSizeVariance;
                 double mass = Math.PI * radius * radius;
                 Random random = new Random();
-                Vector2D pos = new Vector2D(random.nextInt((int) (simWidth - radius*2)), random.nextInt((int) (simHeight - radius*2)));
+                Vector2D pos = new Vector2D(random.nextInt((int) (simWidth - radius*2 - Constants.margin)), random.nextInt((int) (simHeight - radius*2 - Constants.margin)));
                 Vector2D vel = new Vector2D(initialVelocity * Math.random(), initialVelocity * Math.random());
 
                 System.out.println("Ball #" + i + " created at position " + pos.x + "," + pos.y + " with velocity " + vel.x + "," + vel.y);

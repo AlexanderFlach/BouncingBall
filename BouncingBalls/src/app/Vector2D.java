@@ -42,8 +42,12 @@ public class Vector2D {
         return new Vector2D(this.y, -this.x);
     }
 
-    public Vector2D oppositeVector(Vector2D v) {
-        return new Vector2D(-v.x, -v.y);
+    public Vector2D oppositeVector() {
+        return new Vector2D(-this.x, -this.y);
+    }
+
+    public Vector2D normalizeVector() {
+        return new Vector2D(this.x / this.length(), this.y / this.length());
     }
 
     public double length() {

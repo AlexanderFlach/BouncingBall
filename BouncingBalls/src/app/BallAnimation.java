@@ -214,7 +214,12 @@ class BallAnimationPanel extends JPanel {
                 // create vector of wall segment and its normal vector
                 Vector2D v = new Vector2D(line.getX2() - line.getX1(), line.getY2() - line.getY1());
                 Vector2D nv = v.normalVector();
+                nv = nv.normalizeVector();
                 // mirror velocity
+                double dotProduct = ball.vel.dot(nv);
+                Vector2D newVec = new Vector2D(ball.vel.x - 2 * dotProduct * nv.x,
+                        ball.vel.y - 2 * dotProduct * nv.y);
+                ball.vel = newVec;
             }
         }
     }
