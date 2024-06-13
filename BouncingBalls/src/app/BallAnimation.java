@@ -209,17 +209,25 @@ class BallAnimationPanel extends JPanel {
                 line.setLine(octagon[i], octagon[i + 1]);
             }
             if(collidesWith(ball, line)) {
-                System.out.println("Collision with Wall!");
                 // collision response
                 // create vector of wall segment and its normal vector
                 Vector2D v = new Vector2D(line.getX2() - line.getX1(), line.getY2() - line.getY1());
                 Vector2D nv = v.normalVector();
                 nv = nv.normalizeVector();
+                //normal vector facing inwards
+                nv = nv.oppositeVector();
                 // mirror velocity
                 double dotProduct = ball.vel.dot(nv);
-                Vector2D newVec = new Vector2D(ball.vel.x - 2 * dotProduct * nv.x,
+                ball.vel = new Vector2D(ball.vel.x - 2 * dotProduct * nv.x,
                         ball.vel.y - 2 * dotProduct * nv.y);
-                ball.vel = newVec;
+                // push ball into boundaries until it is inside
+                boolean outsideBorder = true;
+                while(outsideBorder) {
+                    if(!collidesWith(ball, line)) {
+                        outsideBorder = false;
+                    }
+                    ball.pos.add(nv);
+                }
             }
         }
     }
