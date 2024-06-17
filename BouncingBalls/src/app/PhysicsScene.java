@@ -21,14 +21,13 @@ public class PhysicsScene {
         this.dt = Constants.DT;
         this.restitution = Constants.RESTITUTION;
 
-        this.worldSize = new Vector2D(0.0, 0.0); // is set later and
-        // depends on frame (window) size
+        this.worldSize = new Vector2D(0.0, 0.0);
 
         this.balls = new ArrayList<>();
         this.polygonX = new int[8];
         this.polygonY = new int[8];
         this.numBalls = Constants.NUM_BALLS;
-        this.isInitialized = false; // flag to avoid multiple initializations
+        this.isInitialized = false; // avoid multiple initializations
     }
 
     void setup(double simWidth, double simHeight) {
@@ -44,7 +43,7 @@ public class PhysicsScene {
                 Vector2D pos = new Vector2D(random.nextInt((int) (simWidth - radius*2 - Constants.margin)), random.nextInt((int) (simHeight - radius*2 - Constants.margin)));
                 Vector2D vel = new Vector2D(initialVelocity * Math.random(), initialVelocity * Math.random());
 
-                System.out.println("Ball #" + i + " created at position " + pos.x + "," + pos.y + " with velocity " + vel.x + "," + vel.y);
+                System.out.println("Ball #" + (i+1) + " created at position " + pos.x + "," + pos.y + " with velocity " + vel.x + "," + vel.y);
                 this.balls.add(new Ball(radius, mass, pos, vel, Constants.RESTITUTION));
             }
         }
