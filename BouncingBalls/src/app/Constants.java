@@ -14,7 +14,7 @@ public class Constants {
 										// if not simulated at render speed
 	public static final double RESTITUTION = 1.0;
 	public static final Vector2D GRAVITY = new Vector2D(0.0, 0.0);
-	public static final int NUM_BALLS = 1;
+	public static final int NUM_BALLS = 7;
 
 	// octagon
 	public static final int margin = 30;

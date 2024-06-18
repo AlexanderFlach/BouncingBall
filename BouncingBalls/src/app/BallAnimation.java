@@ -13,16 +13,14 @@ public class BallAnimation extends Animation {
 
     @Override
     protected ArrayList<JFrame> createFrames(ApplicationTime applicationTimeThread) {
-        // a list of all frames (windows) that will be shown
         ArrayList<JFrame> frames = new ArrayList<>();
 
-        // Create main frame (window)
         JFrame frame = new JFrame("Mathematics and Simulation: Workshop 04");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         BallAnimationPanel panel = new BallAnimationPanel(applicationTimeThread);
         frame.setLayout(new BorderLayout());
         frame.add(panel, BorderLayout.CENTER);
-        frame.pack(); // adjusts size of the JFrame to fit the size of it's components
+        frame.pack();
         frame.setVisible(true);
 
         frames.add(frame);
@@ -64,7 +62,6 @@ class BallAnimationPanel extends JPanel {
     protected void paintComponent(Graphics g) {
 
         super.paintComponent(g);
-        //System.out.println("paintComponent");
         updateSize();
         if (!physicsScene.isInitialized) {
             physicsScene.setup(this.simWidth, this.simHeight);
@@ -74,7 +71,7 @@ class BallAnimationPanel extends JPanel {
     }
 
     public void updateSize() {
-        // set simulation size with respect to window size
+        // updates window size
         simWidth = this.getWidth();
         simHeight = this.getHeight();
         physicsScene.update(this.simWidth, this.simHeight);
@@ -113,14 +110,13 @@ class BallAnimationPanel extends JPanel {
             ball1.simulate(dt, physicsScene.gravity);
             for (int j = i + 1; j < physicsScene.balls.size(); j++) {
                 var ball2 = physicsScene.balls.get(j);
-                handleBallCollision(ball1, ball2, physicsScene.restitution);
+                handleBallCollision(ball1, ball2);
             }
-            handleWallCollision(ball1, physicsScene.worldSize);
             handleWallCollision(ball1);
         }
     }
 
-    void handleBallCollision(Ball ball1, Ball ball2, double restitution) {
+    void handleBallCollision(Ball ball1, Ball ball2) {
         Vector2D distance = new Vector2D(0.0, 0.0);
         // middle points of balls
         Vector2D vec1 = new Vector2D(ball1.radius + ball1.pos.x, ball1.radius + ball1.pos.y);
@@ -133,9 +129,9 @@ class BallAnimationPanel extends JPanel {
             return;
         }
 
-        System.out.println("Ball Collision!");
         // collision response
-        // Normale des Stoßes
+
+        // normals
         double nx = distance.x / d;
         double ny = distance.y / d;
         // Relativgeschwindigkeit
@@ -145,21 +141,16 @@ class BallAnimationPanel extends JPanel {
         // Relativgeschwindigkeit in Richtung der Normalen
         double vn = dvx * nx + dvy * ny;
 
-        // Keine Kollision, wenn die Scheiben sich voneinander entfernen
-        if (vn > 0) {
-            return;
-        }
-
         // Impulsänderung
         double impulse = 2 * vn / (ball1.mass + ball2.mass);
 
-        // Neue Geschwindigkeiten
+        // new velocity
         ball1.vel.x += impulse * ball2.mass * nx;
         ball1.vel.y += impulse * ball2.mass * ny;
         ball2.vel.x -= impulse * ball1.mass * nx;
         ball2.vel.y -= impulse * ball1.mass * ny;
 
-        // Zur Vermeidung des Überschneidens, korrigieren wir die Positionen
+        // set ball to correct position
         double overlap = 0.5 * (ball1.radius + ball2.radius - d);
         ball1.pos.x -= overlap * nx;
         ball1.pos.y -= overlap * ny;
@@ -168,7 +159,7 @@ class BallAnimationPanel extends JPanel {
     }
 
 // Stoß mit Energieverlust
-//    void handleBallCollision(Ball ball1, Ball ball2, double restitution) {
+//    void handleBallCollision(Ball ball1, Ball ball2) {
 //        Vector2D distance = new Vector2D(0.0, 0.0);
 //        distance.subtractVectors(ball2.pos, ball1.pos);
 //        double d = distance.length();
@@ -202,7 +193,7 @@ class BallAnimationPanel extends JPanel {
 //    }
 
     public boolean collidesWith(Ball ball, Line2D line) {
-        // Kollision des Balls mit der Linie überprüfen
+        // check collision of ball and line
         return Line2D.ptSegDist(line.getX1(), line.getY1(), line.getX2(), line.getY2(), ball.pos.x + ball.radius, ball.pos.y + ball.radius) <= ball.radius;
     }
 
