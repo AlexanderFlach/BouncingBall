@@ -26,12 +26,25 @@ public class BallAnimation extends Animation {
         frame.setVisible(true);
 
         frames.add(frame);
+
+        JFrame frame2 = new JFrame("Values");
+        frame2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        AnimationValuesPanel panel2 = new AnimationValuesPanel(applicationTimeThread, panel.physicsScene);
+        frame2.add(panel2);
+        frame2.setLocation(800, 0);
+        frame2.pack();
+        frame2.setVisible(true);
+
+
+        frames.add(frame2);
+
+
         return frames;
     }
 }
 
 class BallAnimationPanel extends JPanel {
-    private final PhysicsScene physicsScene;
+    public final PhysicsScene physicsScene;
     private final ApplicationTime thread;
     private double simWidth;
     private double simHeight;
@@ -43,7 +56,7 @@ class BallAnimationPanel extends JPanel {
     }
 
     public Dimension getPreferredSize() {
-        return new Dimension(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT);
+            return new Dimension(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT);
     }
 
     // drawing
@@ -72,7 +85,7 @@ class BallAnimationPanel extends JPanel {
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
 
         // draw octagon with corner points
-        g.setColor(Color.BLUE);
+        g.setColor(Color.DARK_GRAY);
         g.drawPolygon(physicsScene.polygonX, physicsScene.polygonY, 8);
         g.fillPolygon(physicsScene.polygonX, physicsScene.polygonY, 8);
 
@@ -252,7 +265,43 @@ class BallAnimationPanel extends JPanel {
         }
 
     }
+}
 
+class AnimationValuesPanel extends JPanel{
+    private final PhysicsScene physicsScene;
+    private final ApplicationTime thread;
+
+
+    public AnimationValuesPanel(ApplicationTime thread, PhysicsScene physicsScene) {
+        this.physicsScene = physicsScene;
+        this.thread = thread;
+    }
+
+    public Dimension getPreferredSize() {
+        return new Dimension(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT);
+    }
+
+    // drawing
+    @Override
+    protected void paintComponent(Graphics g) {
+
+        super.paintComponent(g);
+
+        String X;
+        String Y;
+        String Z;
+        int i = 0;
+
+        for (Ball ball: physicsScene.balls){
+            X = "x: " + ball.pos.x + ball.radius + " y: " + ball.pos.y + ball.radius;
+            g.drawString(X, 50, 50 + i * 20);
+            i++;
+        }
+
+
+
+
+    }
 }
 
 

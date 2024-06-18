@@ -21,6 +21,6 @@ public class Constants {
 
 	// ball settings
 	public static final double INITIAL_VELOCITY = 200.0;
-	public static final double MIN_BALL_SIZE = 30;
-	public static final double BALL_SIZE_VARIANCE = 40;
+	public static final double MIN_BALL_SIZE = 20;
+	public static final double BALL_SIZE_VARIANCE = 30;
 }
