@@ -32,7 +32,6 @@ public class BallAnimation extends Animation {
         frame2.pack();
         frame2.setVisible(true);
 
-
         frames.add(frame2);
 
 
@@ -88,7 +87,7 @@ class BallAnimationPanel extends JPanel {
         // iterate through balls
         for (int i = 0; i < physicsScene.balls.size(); i++) {
             Ball ball = physicsScene.balls.get(i);
-            g.setColor(Color.RED);
+            g.setColor(ball.color);
             g.fillOval((int) ball.pos.x, (int) ball.pos.y, (int) ball.radius*2, (int) ball.radius*2);
         }
     }
@@ -219,16 +218,18 @@ class AnimationCoordinatesPanel extends JPanel{
         super.paintComponent(g);
 
         String X;
-        String Y;
-        String Z;
+        g.setColor(Color.GRAY);
+        g.fillRect(0, 0, this.getWidth(), this.getHeight());
         int i = 0;
 
         g.setFont(new Font("Serif", Font.PLAIN, 20));
         for (Ball ball: physicsScene.balls){
             X = "x: " + Math.round(ball.pos.x + ball.radius) + " y: " + Math.round(ball.pos.y + ball.radius);
+            g.setColor(ball.color);
             g.drawString(X, 50, 50 + i * 20);
             i++;
         }
+
     }
 }
 

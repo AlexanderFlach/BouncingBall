@@ -45,7 +45,9 @@ public class PhysicsScene {
                 Vector2D vel = new Vector2D(initialVelocity * Math.random(), initialVelocity * Math.random());
 
                 System.out.println("Ball #" + (i+1) + " created at position " + pos.x + "," + pos.y + " with velocity " + vel.x + "," + vel.y);
-                this.balls.add(new Ball(radius, mass, pos, vel, Constants.RESTITUTION));
+                Random rand = new Random();
+                Color randomColor = new Color(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256));
+                this.balls.add(new Ball(radius, mass, pos, vel, Constants.RESTITUTION, randomColor));
             }
         }
         if(this.polygonX[0] == 0) {
