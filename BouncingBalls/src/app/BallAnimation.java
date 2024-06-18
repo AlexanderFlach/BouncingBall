@@ -7,7 +7,6 @@ import java.awt.*;
 
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class BallAnimation extends Animation {
 
@@ -15,7 +14,7 @@ public class BallAnimation extends Animation {
     protected ArrayList<JFrame> createFrames(ApplicationTime applicationTimeThread) {
         ArrayList<JFrame> frames = new ArrayList<>();
 
-        JFrame frame = new JFrame("Mathematics and Simulation: Workshop 04");
+        JFrame frame = new JFrame("Ball Collision Simulation");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         BallAnimationPanel panel = new BallAnimationPanel(applicationTimeThread);
         frame.setLayout(new BorderLayout());
@@ -25,11 +24,11 @@ public class BallAnimation extends Animation {
 
         frames.add(frame);
 
-        JFrame frame2 = new JFrame("Values");
+        JFrame frame2 = new JFrame("Coordinates of Balls");
         frame2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        AnimationValuesPanel panel2 = new AnimationValuesPanel(applicationTimeThread, panel.physicsScene);
+        AnimationCoordinatesPanel panel2 = new AnimationCoordinatesPanel(applicationTimeThread, panel.physicsScene);
         frame2.add(panel2);
-        frame2.setLocation(800, 0);
+        frame2.setLocation(1100, 0);
         frame2.pack();
         frame2.setVisible(true);
 
@@ -110,87 +109,49 @@ class BallAnimationPanel extends JPanel {
             ball1.simulate(dt, physicsScene.gravity);
             for (int j = i + 1; j < physicsScene.balls.size(); j++) {
                 var ball2 = physicsScene.balls.get(j);
-                handleBallCollision(ball1, ball2);
+                handleBallCollision(ball1, ball2, Constants.RESTITUTION);
             }
             handleWallCollision(ball1);
         }
     }
 
-    void handleBallCollision(Ball ball1, Ball ball2) {
-        Vector2D distance = new Vector2D(0.0, 0.0);
+
+    void handleBallCollision(Ball ball1, Ball ball2, double restitution) {
+        // vector between middle points of balls
+        Vector2D dir = new Vector2D(0.0, 0.0);
         // middle points of balls
         Vector2D vec1 = new Vector2D(ball1.radius + ball1.pos.x, ball1.radius + ball1.pos.y);
         Vector2D vec2 = new Vector2D(ball2.radius + ball2.pos.x, ball2.radius + ball2.pos.y);
-        // vector between middle points of balls
-        distance.subtractVectors(vec2, vec1);
-        double d = distance.length();
-        // no collision
-        if(d == 0.0 || d > ball1.radius + ball2.radius) {
+
+        dir.subtractVectors(vec2, vec1);
+        double d = dir.length();
+        if (d == 0.0 || d > ball1.radius + ball2.radius) {
+            // no collision
             return;
         }
 
         // collision response
+        dir.scale(1.0 / d);
 
-        // normals
-        double nx = distance.x / d;
-        double ny = distance.y / d;
-        // Relativgeschwindigkeit
-        double dvx = ball2.vel.x - ball1.vel.x;
-        double dvy = ball2.vel.y - ball1.vel.y;
+        double corr = (ball1.radius + ball2.radius - d) / 2.0;
+        ball1.pos.addScaled(dir, -corr);
+        ball2.pos.addScaled(dir, corr);
 
-        // Relativgeschwindigkeit in Richtung der Normalen
-        double vn = dvx * nx + dvy * ny;
+        double v1 = ball1.vel.dot(dir);
+        double v2 = ball2.vel.dot(dir);
 
-        // Impulsänderung
-        double impulse = 2 * vn / (ball1.mass + ball2.mass);
+        double m1 = ball1.mass;
+        double m2 = ball2.mass;
 
-        // new velocity
-        ball1.vel.x += impulse * ball2.mass * nx;
-        ball1.vel.y += impulse * ball2.mass * ny;
-        ball2.vel.x -= impulse * ball1.mass * nx;
-        ball2.vel.y -= impulse * ball1.mass * ny;
+        double newV1 = (m1 * v1 + m2 * v2 - m2 * (v1 - v2) * restitution)
+                / (m1 + m2);
+        double newV2 = (m1 * v1 + m2 * v2 - m1 * (v2 - v1) * restitution)
+                / (m1 + m2);
 
-        // set ball to correct position
-        double overlap = 0.5 * (ball1.radius + ball2.radius - d);
-        ball1.pos.x -= overlap * nx;
-        ball1.pos.y -= overlap * ny;
-        ball2.pos.x += overlap * nx;
-        ball2.pos.y += overlap * ny;
+        ball1.vel.addScaled(dir, newV1 - v1);
+        ball2.vel.addScaled(dir, newV2 - v2);
     }
 
-// Stoß mit Energieverlust
-//    void handleBallCollision(Ball ball1, Ball ball2) {
-//        Vector2D distance = new Vector2D(0.0, 0.0);
-//        distance.subtractVectors(ball2.pos, ball1.pos);
-//        double d = distance.length();
-//        // no collision
-//        if(d == 0.0 || d > ball1.radius + ball2.radius) {
-//            System.out.println("no Collision");
-//            return;
-//        }
-//        System.out.println("Collision!!!");
-//        // collision response
-//        // Normale des Stoßes
-//        double nx = distance.x / d;
-//        double ny = distance.y / d;
-//        // Geschwindigkeit in Richtung der Normalen projizieren
-//        double v1n = ball1.vel.x * nx + ball1.vel.y * ny;
-//        double v2n = ball2.vel.x * nx + ball2.vel.y * ny;
-//
-//        // Geschwindigkeit in tangentialer Richtung projizieren (bleibt unverändert)
-//        double v1t = -ball1.vel.x * ny + ball1.vel.y * nx;
-//        double v2t = -ball2.vel.x * ny + ball2.vel.y * nx;
-//
-//        // Neue Geschwindigkeiten in Normalrichtung nach dem Stoß
-//        double v1nNew = (v1n * (ball1.mass - ball2.mass) + 2 * ball2.mass * v2n) / (ball1.mass + ball2.mass);
-//        double v2nNew = (v2n * (ball2.mass - ball1.mass) + 2 * ball1.mass * v1n) / (ball1.mass + ball2.mass);
-//
-//        // Zurückprojektion auf x- und y-Koordinaten
-//        ball1.vel.x = v1nNew * nx - v1t * ny;
-//        ball1.vel.y = v1nNew * ny + v1t * nx;
-//        ball2.vel.x = v2nNew * nx - v2t * ny;
-//        ball2.vel.y = v2nNew * ny + v2t * nx;
-//    }
 
     public boolean collidesWith(Ball ball, Line2D line) {
         // check collision of ball and line
@@ -235,41 +196,20 @@ class BallAnimationPanel extends JPanel {
             }
         }
     }
-
-    void handleWallCollision(Ball ball, Vector2D worldSize) {
-        if (ball.pos.x <= 0) { // left
-            ball.pos.x = 0.0;
-            ball.vel.x = -ball.vel.x;
-        }
-        if (ball.pos.x + ball.radius*2 > worldSize.x) { // right
-            ball.pos.x = worldSize.x - ball.radius*2;
-            ball.vel.x = -ball.vel.x;
-        }
-        if (ball.pos.y <= 0) { // top
-            ball.pos.y = 0.0;
-            ball.vel.y = -ball.vel.y;
-        }
-
-        if (ball.pos.y + ball.radius*2 > worldSize.y) { // bottom
-            ball.pos.y = worldSize.y - ball.radius*2;
-            ball.vel.y = -ball.vel.y;
-        }
-
-    }
 }
 
-class AnimationValuesPanel extends JPanel{
+class AnimationCoordinatesPanel extends JPanel{
     private final PhysicsScene physicsScene;
     private final ApplicationTime thread;
 
 
-    public AnimationValuesPanel(ApplicationTime thread, PhysicsScene physicsScene) {
+    public AnimationCoordinatesPanel(ApplicationTime thread, PhysicsScene physicsScene) {
         this.physicsScene = physicsScene;
         this.thread = thread;
     }
 
     public Dimension getPreferredSize() {
-        return new Dimension(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT);
+        return new Dimension(Constants.WINDOW_WIDTH -750, Constants.WINDOW_HEIGHT);
     }
 
     // drawing
@@ -283,15 +223,12 @@ class AnimationValuesPanel extends JPanel{
         String Z;
         int i = 0;
 
+        g.setFont(new Font("Serif", Font.PLAIN, 20));
         for (Ball ball: physicsScene.balls){
-            X = "x: " + ball.pos.x + ball.radius + " y: " + ball.pos.y + ball.radius;
+            X = "x: " + Math.round(ball.pos.x + ball.radius) + " y: " + Math.round(ball.pos.y + ball.radius);
             g.drawString(X, 50, 50 + i * 20);
             i++;
         }
-
-
-
-
     }
 }
 
